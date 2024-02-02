@@ -1,0 +1,35 @@
+// function for setting umask (linux format, example 755)
+setUmask = function(permString, file, recursive)
+    ugo = "ugo"
+    for i in range(len(permString)-1)
+        addPerm = ugo[i]+"+"
+        rmPerm = ugo[i]+"-"
+
+        if bitwise("&",permString[i].val,4) then addPerm=addPerm+"r" else rmPerm=rmPerm+"r"
+        if bitwise("&",permString[i].val,2) then addPerm=addPerm+"w" else rmPerm=rmPerm+"w"
+        if bitwise("&",permString[i].val,1) then addPerm=addPerm+"x" else rmPerm=rmPerm+"x"
+
+        if addPerm != ugo[i]+"+" then output = file.chmod(addPerm, recursive)
+        if rmPerm != ugo[i]+"-" then output = file.chmod(rmPerm, recursive)
+    end for
+    if output then print(output)
+end function
+
+setPerm = function(permission, file, recursive)
+    output = file.chmod(permission, recursive)
+    if output then print(output)
+end function
+
+if params.len < 2 then exit("Usage: chmod (opt:-R) umask file/folder")
+isRecursive = params[0] == "-R"
+permissionsString = params[-2]
+pathFile = params[-1]
+
+file = get_shell.host_computer.File(pathFile)
+if file == null then exit("chmod: can't find " + pathFile)
+
+if permissionsString.is_match("[0-7]{3}") then
+    setUmask(permissionsString, file, isRecursive)
+else
+    setPerm(permissionsString, file, isRecursive)
+end if

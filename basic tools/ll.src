@@ -1,0 +1,2 @@
+//Command alias ls -la
+get_shell.launch("/bin/ls","-la "+current_path);
