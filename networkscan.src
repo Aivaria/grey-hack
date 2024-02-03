@@ -1,58 +1,8 @@
 devicesMap = {}
 map = {}
-showPorts = false
+showPorts = true
 showFirewall = false
 remote = false
-treeview = false
-
-portOutput = function(router, ports, showLan = false)
-    colorHeader = "c:r"
-    colorSpacer = "c:d"
-    colorPositive = "c:p"
-    colorNegative = "c:n"
-    lines = {}
-    lines[0] = [ "PORT", "STATE", "SERVICE", "VERSION"]
-    lines[1] = [ "----", "-----", "-------", "-------"]
-
-    if showLan then
-        routerversion = router.kernel_version
-        lines[0] = lines[0].insert(0, "HOST")
-        lines[1] = lines[1].insert(0, "----")
-        lines[2] = [colorSpacer+router.local_ip, "0", colorPositive+"OPEN", "kernel_router", routerversion]
-    end if
-    lines[0][0] = colorHeader+lines[0][0]
-    lines[1][0] = colorSpacer+lines[1][0]
-    for port in ports
-        currentLine = lines.len;
-        if typeof(port) != "port" then continue
-        service_info = router.port_info(port).split(" ")
-
-        port_status = colorPositive+"OPEN"
-        if port.is_closed then port_status = colorNegative+"CLOSED"
-        lines[currentLine] = [port.port_number, port_status.trim, service_info[0].trim, service_info[1].trim]
-
-        if showLan then
-            lan_ips = port.get_lan_ip.trim
-            lines[currentLine] = lines[currentLine].insert(0, lan_ips.trim)
-        end if
-        lines[currentLine][0] = colorSpacer+lines[currentLine][0]
-    end for
-    forReturn = ""
-
-    for i in range(0,len(lines)-1)
-        forReturn = forReturn + "\n" +lines[i].join(" ")
-    end for
-    forReturn = format_columns(forReturn)
-    forReturn = "<color=red>"+forReturn
-    forReturn = replace_regex(forReturn, "\n","</color>\n")
-    forReturn = replace_regex(forReturn, colorHeader+"(.*?\s)","<color=#00FFED>$1   ")
-    forReturn = replace_regex(forReturn, colorSpacer+"(.*?\s)","<color=#707070>$1   ")
-    forReturn = replace_regex(forReturn, colorNegative+"(.*?\s)","<color=red>$1</color>   ")
-    forReturn = replace_regex(forReturn, colorPositive+"(.*?\s)","<color=#00FF00>$1</color>   ")
-
-    if lines.len>2 then return forReturn + "\n" else return null
-
-end function
 
 firewalloutput = function(rules)
         if rules.len == 0 then return null
@@ -66,7 +16,14 @@ scanRouter = function(pRouter, depth=0)
     forReturn = {}
 
     ports = pRouter.device_ports(pRouter.local_ip)
-    if ports != null then forReturn["ports"] = pRouter.device_ports(pRouter.local_ip)
+    if ports != null and showPorts then
+        forReturn["ports"] ={}
+        forReturn["ports"]["0"]={"open":true, "service":"kernel_router", "version":pRouter.kernel_version, "lan_ip":pRouter.local_ip}
+        for port in ports
+            info = pRouter.port_info(port).split(" ")
+            forReturn["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1], "lan_ip":port.get_lan_ip}
+        end for
+    end if
 
     firewall = pRouter.firewall_rules
     if firewall != null and firewall.len >0 then forReturn["firewall"] =firewall
@@ -81,14 +38,24 @@ scanRouter = function(pRouter, depth=0)
         if devicesMap.hasIndex(ip) then continue
         devicesMap[ip]={}
         router = get_router(ip)
-
         if router == null then
             forReturn["devices"][ip] = {}
             forReturn["devices"][ip]["type"] = "server"
             forReturn["devices"][ip]["router"] = pRouter
             devicesMap[ip]=forReturn["devices"][ip]
             ports = pRouter.device_ports(ip)
-            if ports != null and ports.len > 0 then forReturn["devices"][ip]["ports"]=ports
+            if ports != null and ports.len > 0 then
+                if showPorts then
+                    forReturn["devices"][ip]["ports"]={}
+                    for port in ports
+                        info = pRouter.port_info(port).split(" ")
+                        if info[0] == "cam" then forReturn["devices"][ip]["type"] = "cam"
+                        forReturn["devices"][ip]["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1]}
+                    end for
+                end if
+            else
+                forReturn["devices"][ip]["type"] = "pc"
+            end if
         else
             forReturn["devices"][ip] = scanRouter(router, pDepth)
         end if
@@ -97,69 +64,62 @@ scanRouter = function(pRouter, depth=0)
 end function
 
 printTree  = function(map, pDepth =0)
-    depth = pDepth +1
-
     for index in map.indexes
         currentMap = map[index]
         if currentMap.hasIndex("public_ip") then print("<color=red>Public: "+currentMap["public_ip"]+"</color>")
-        deviceIp = (">   "*pDepth)+index+" "+"("+currentMap["type"]+")"
-        if currentMap["type"] == "router" then deviceIp = "<color=green>"+deviceIp+"</color>"
-        if currentMap["type"] == "server" then deviceIp = "<color=yellow>"+deviceIp+"</color>"
-        print(deviceIp)
-        if currentMap.hasIndex("devices") then printTree(currentMap["devices"], depth)
-    end for
-end function
 
-printMap = function(map, pDepth =0)
-    depth = pDepth +1
-    for index in map.indexes
-        currentMap = map[index]
-        output = currentMap["type"] == "router"
-        if output or (showPorts and currentMap.hasIndex("ports")) or  showFirewall and currentMap.hasIndex("firewall") then
-            deviceIp = index+" "+"("+currentMap["type"]+")"
-            if currentMap["type"] == "router" then deviceIp = "<color=green>"+deviceIp+"</color>"
-            if currentMap["type"] == "server" then deviceIp = "<color=yellow>"+deviceIp+"</color>"
-            doPortOutput = null
-            doFwOutput = null
-            if (showPorts and currentMap.hasIndex("ports")) then doPortOutput = portOutput(currentMap["router"], currentMap["ports"], currentMap["type"] == "router")
-            if showFirewall and currentMap.hasIndex("firewall") then doFwOutput =firewalloutput(currentMap["firewall"])
-            if output or doPortOutput!= null or  doFwOutput != null then
-                print("v"*40)
-                print(deviceIp)
-                if doPortOutput != null then print(doPortOutput)
-                if doFwOutput != null then print(doFwOutput)
-                print("^"*40)
-            end if
+        deviceIp=index+" "+"("+currentMap["type"]+")"
+        deviceIp = ("    "*(pDepth))+deviceIp
+
+        if currentMap["type"] == "router" then deviceIp = "<color=#00D8FF>"+deviceIp+"</color>"
+        if currentMap["type"] == "server" then deviceIp = "<color=#00FF6A>"+deviceIp+"</color>"
+        if currentMap["type"] == "cam" then deviceIp = "<color=#F2FF00>"+deviceIp+"</color>"
+        if currentMap["type"] == "pc" then deviceIp = "<color=#FF00C7>"+deviceIp+"</color>"
+        print(deviceIp)
+        if currentMap.hasIndex("ports") then
+            ports = currentMap["ports"]
+            lines = ""
+            for port in ports.indexes
+                if ports[port]["open"] then state = "<color=#00FF00>+</color>" else state = "<color=#FF0000>-</color>"
+                extraData = "\n"
+                if ports[port].hasIndex("lan_ip") then
+                    if ports[port]["lan_ip"] != index then
+                        state = "<color=#00FFE5>></color>"
+                        extraData = " "+ports[port]["lan_ip"]+"\n"
+                    end if
+                end if
+                lines = lines+("__space__")+ state +" "+port+" "+ports[port]["service"]+" "+ports[port]["version"]+extraData
+
+
+            end for
+            formated = format_columns(lines)
+            formated = replace_regex(formated, "__space__",("    "*(pDepth))+"<color=grey>|-</color> ")
+            print(formated)
         end if
-        if currentMap.hasIndex("devices") then printMap(currentMap["devices"], depth)
+        if currentMap.hasIndex("devices") then printTree(currentMap["devices"], pDepth+1)
     end for
 end function
 
 //Command: networkscan
-usageString = "Usage: networkscan (opt:-h --show help) (opt:-fw --show firewall) (opt:-p --show ports) (opt:-t --show treeview) (opt:ip(1.1.1.1))";
+usageString = "Usage: networkscan (opt:-h ""show help"") (opt:--no-ports ""hide ports"") (opt:ip(1.1.1.1))";
 router = get_router()
 
 for e in params
     if e == "-h" then exit(usageString)
-    if e == "firewall" or e == "-fw" then showFirewall = true
-    if e == "ports" or e == "-p" then showPorts = true
-    if e == "-t" then treeview = true
+    if e == "-fw" then showFirewall = true
+    if e == "--no-ports" then showPorts = false
     if is_valid_ip(e) then
         remote = true
         router = get_router(e)
     end if
 end for
 
-if treeview == showFirewall == showPorts == false then treeview = true
-
 devicesMap[router.local_ip()]={}
 map[router.local_ip()] = scanRouter(router)
 map[router.local_ip()]["public_ip"] = router.public_ip
-if treeview then
-    print("Treeview:\n\n")
-    printTree(map)
-    print("\n")
-end if
-if showFirewall or showPorts then
-    printMap(map)
-end if
+
+printTree(map)
+print("\n")
+
+//if showFirewall or showPorts then
+//end if
