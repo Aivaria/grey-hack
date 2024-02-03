@@ -16,7 +16,7 @@ scanRouter = function(pRouter, depth=0)
     forReturn = {}
 
     ports = pRouter.device_ports(pRouter.local_ip)
-    if ports != null and showPorts then
+    if ports != null then
         forReturn["ports"] ={}
         forReturn["ports"]["0"]={"open":true, "service":"kernel_router", "version":pRouter.kernel_version, "lan_ip":pRouter.local_ip}
         for port in ports
@@ -45,14 +45,12 @@ scanRouter = function(pRouter, depth=0)
             devicesMap[ip]=forReturn["devices"][ip]
             ports = pRouter.device_ports(ip)
             if ports != null and ports.len > 0 then
-                if showPorts then
-                    forReturn["devices"][ip]["ports"]={}
-                    for port in ports
-                        info = pRouter.port_info(port).split(" ")
-                        if info[0] == "cam" then forReturn["devices"][ip]["type"] = "cam"
-                        forReturn["devices"][ip]["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1]}
-                    end for
-                end if
+                forReturn["devices"][ip]["ports"]={}
+                for port in ports
+                    info = pRouter.port_info(port).split(" ")
+                    if info[0] == "cam" then forReturn["devices"][ip]["type"] = "cam"
+                    forReturn["devices"][ip]["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1]}
+                end for
             else
                 forReturn["devices"][ip]["type"] = "pc"
             end if
@@ -74,9 +72,9 @@ printTree  = function(map, pDepth =0)
         if currentMap["type"] == "router" then deviceIp = "<color=#00D8FF>"+deviceIp+"</color>"
         if currentMap["type"] == "server" then deviceIp = "<color=#00FF6A>"+deviceIp+"</color>"
         if currentMap["type"] == "cam" then deviceIp = "<color=#F2FF00>"+deviceIp+"</color>"
-        if currentMap["type"] == "pc" then deviceIp = "<color=#FF00C7>"+deviceIp+"</color>"
+        if currentMap["type"] == "pc" then deviceIp = "<color=#FF6DC9>"+deviceIp+"</color>"
         print(deviceIp)
-        if currentMap.hasIndex("ports") then
+        if currentMap.hasIndex("ports") and showPorts then
             ports = currentMap["ports"]
             lines = ""
             for port in ports.indexes
