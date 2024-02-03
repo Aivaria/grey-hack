@@ -1,8 +1,8 @@
 metaxploit = include_lib("/lib/metaxploit.so")
 scanlib = function(filename)
-    if filename.indexOf(".so") == null then return null
     lib = metaxploit.load(filename)
-    return lib.version
+    if lib == null then return null
+    return lib.lib_name+" "+lib.version
 end function
 
 pwd ="/lib"
@@ -11,7 +11,7 @@ if params.len > 0 then
 end if
 parent = get_shell.host_computer.File(pwd)
 if parent == null then exit()
-output = "Filename Version\n"
+output = "Filename Lib Version\n"
 
 if parent.is_folder then
 	files = parent.get_files
