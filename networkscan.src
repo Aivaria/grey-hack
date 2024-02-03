@@ -47,9 +47,13 @@ scanRouter = function(pRouter, depth=0)
             if ports != null and ports.len > 0 then
                 forReturn["devices"][ip]["ports"]={}
                 for port in ports
-                    info = pRouter.port_info(port).split(" ")
-                    if info[0] == "cam" then forReturn["devices"][ip]["type"] = "cam"
-                    forReturn["devices"][ip]["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1]}
+                    if typeof(port) == "port" then
+                        info = pRouter.port_info(port).split(" ")
+                        if info[0] == "cam" then forReturn["devices"][ip]["type"] = "cam"
+                        forReturn["devices"][ip]["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1]}
+                    else
+                        forReturn["devices"][ip]["firewall"]=true
+                    end if
                 end for
             else
                 forReturn["devices"][ip]["type"] = "pc"
@@ -73,6 +77,7 @@ printTree  = function(map, pDepth =0)
         if currentMap["type"] == "server" then deviceIp = "<color=#00FF6A>"+deviceIp+"</color>"
         if currentMap["type"] == "cam" then deviceIp = "<color=#F2FF00>"+deviceIp+"</color>"
         if currentMap["type"] == "pc" then deviceIp = "<color=#FF6DC9>"+deviceIp+"</color>"
+        if currentMap.hasIndex("firewall") and currentMap["firewall"] then deviceIp = deviceIp+" <color=#FF0000>(FIREWALLED)</color>"
         print(deviceIp)
         if currentMap.hasIndex("ports") and showPorts then
             ports = currentMap["ports"]
@@ -92,7 +97,9 @@ printTree  = function(map, pDepth =0)
             end for
             formated = format_columns(lines)
             formated = replace_regex(formated, "__space__",("    "*(pDepth))+"<color=grey>|-</color> ")
-            print(formated)
+            if formated != "" then
+                print(formated)
+            end if
         end if
         if currentMap.hasIndex("devices") then printTree(currentMap["devices"], pDepth+1)
     end for
