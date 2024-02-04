@@ -52,6 +52,7 @@ scanRouter = function(pRouter, depth=0)
                         if info[0] == "cam" then forReturn["devices"][ip]["type"] = "cam"
                         forReturn["devices"][ip]["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1]}
                     else
+                        forReturn["devices"][ip]["type"] = "unknown"
                         forReturn["devices"][ip]["firewall"]=true
                     end if
                 end for
@@ -77,6 +78,7 @@ printTree  = function(map, pDepth =0)
         if currentMap["type"] == "server" then deviceIp = "<color=#00FF6A>"+deviceIp+"</color>"
         if currentMap["type"] == "cam" then deviceIp = "<color=#F2FF00>"+deviceIp+"</color>"
         if currentMap["type"] == "pc" then deviceIp = "<color=#FF6DC9>"+deviceIp+"</color>"
+        if currentMap["type"] == "unknown" then deviceIp = "<color=#8CA59C>"+deviceIp+"</color>"
         if currentMap.hasIndex("firewall") and currentMap["firewall"] then deviceIp = deviceIp+" <color=#FF0000>(FIREWALLED)</color>"
         print(deviceIp)
         if currentMap.hasIndex("ports") and showPorts then
