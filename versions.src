@@ -1,3 +1,4 @@
+//version scanner for libs.
 metaxploit = include_lib("/lib/metaxploit.so")
 scanlib = function(filename)
     lib = metaxploit.load(filename)

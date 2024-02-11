@@ -1,3 +1,4 @@
+//fancy nmap
 devicesMap = {}
 map = {}
 showPorts = true
@@ -115,9 +116,11 @@ for e in params
     if e == "-h" then exit(usageString)
     if e == "-fw" then showFirewall = true
     if e == "--no-ports" then showPorts = false
-    if is_valid_ip(e) then
+    if is_valid_ip(e) or is_valid_ip(nslookup(e)) or is_valid_ip(nslookup("wwww."+e)) then
         remote = true
-        router = get_router(e)
+        if(is_valid_ip(e)) then router = get_router(e)
+        if(is_valid_ip(nslookup(e))) then router = get_router(nslookup(e))
+        if(is_valid_ip(nslookup("wwww."+e))) then router = get_router(nslookup("wwww."+e))
     end if
 end for
 
