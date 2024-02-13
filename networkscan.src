@@ -116,11 +116,11 @@ for e in params
     if e == "-h" then exit(usageString)
     if e == "-fw" then showFirewall = true
     if e == "--no-ports" then showPorts = false
-    if is_valid_ip(e) or is_valid_ip(nslookup(e)) or is_valid_ip(nslookup("wwww."+e)) then
+    if is_valid_ip(e) or is_valid_ip(nslookup(e)) or is_valid_ip(nslookup("www."+e)) then
         remote = true
         if(is_valid_ip(e)) then router = get_router(e)
         if(is_valid_ip(nslookup(e))) then router = get_router(nslookup(e))
-        if(is_valid_ip(nslookup("wwww."+e))) then router = get_router(nslookup("wwww."+e))
+        if(is_valid_ip(nslookup("www."+e))) then router = get_router(nslookup("www."+e))
     end if
 end for
 
@@ -130,6 +130,3 @@ map[router.local_ip()]["public_ip"] = router.public_ip
 
 printTree(map)
 print("\n")
-
-//if showFirewall or showPorts then
-//end if
