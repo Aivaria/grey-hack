@@ -82,6 +82,11 @@ printTree  = function(map, pDepth =0)
         if currentMap["type"] == "unknown" then deviceIp = "<color=#8CA59C>"+deviceIp+"</color>"
         if currentMap.hasIndex("firewall") and currentMap["firewall"] then deviceIp = deviceIp+" <color=#FF0000>(FIREWALLED)</color>"
         print(deviceIp)
+        if showFirewall and currentMap.hasIndex("firewall") then
+            for firewallRule in currentMap["firewall"].values
+                print(("    "*(pDepth))+firewallRule)
+            end for
+        end if
         if currentMap.hasIndex("ports") and showPorts then
             ports = currentMap["ports"]
             lines = ""
