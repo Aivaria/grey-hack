@@ -1,31 +1,31 @@
-//version scanner for libs.
+// version scanner for libs.
 metaxploit = include_lib("/lib/metaxploit.so")
 scanlib = function(filename)
-    lib = metaxploit.load(filename)
-    if lib == null then return null
-    return lib.lib_name+" "+lib.version
+	lib = metaxploit.load(filename)
+	if lib == null then return null
+	return lib.lib_name + " " + lib.version
 end function
 
-pwd ="/lib"
+pwd = "/lib"
 if params.len > 0 then
-    pwd = params[0]
+	pwd = params[0]
 end if
 parent = get_shell.host_computer.File(pwd)
-if parent == null then exit()
+if parent == null then exit
 output = "Filename Lib Version\n"
 
 if parent.is_folder then
 	files = parent.get_files
 	for file in files
-	    version = scanlib(file.path())
-	    if version == null then
-			output=output+file.name+" --no_lib--\n"
+		version = scanlib(file.path)
+		if version == null then
+			output = output + file.name + " --no_lib--\n"
 		else
-			output=output+file.name+" "+version+"\n"
+			output = output + file.name + " " + version + "\n"
 		end if
 	end for
 else
-    version = scanlib(parent.path())
-    output=output+parent.name+" "+version+"\n"
+	version = scanlib(parent.path)
+	output = output + parent.name + " " + version + "\n"
 end if
 print(format_columns(output))
