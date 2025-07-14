@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/grey-hack.iml" filepath="$PROJECT_DIR$/.idea/grey-hack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../grey-hack-private/.idea/grey-hack-private.iml" filepath="$PROJECT_DIR$/../grey-hack-private/.idea/grey-hack-private.iml" />
+    </modules>
+  </component>
+</project>

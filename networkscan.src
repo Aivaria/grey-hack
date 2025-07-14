@@ -51,6 +51,7 @@ scanRouter = function(pRouter, depth=0)
                     if typeof(port) == "port" then
                         info = pRouter.port_info(port).split(" ")
                         if info[0] == "cam" then forReturn["devices"][ip]["type"] = "cam"
+                        if port.port_number == 8080 then forReturn["devices"][ip]["type"] = "router"
                         forReturn["devices"][ip]["ports"][port.port_number]={"open":port.is_closed==false, "service":info[0], "version":info[1]}
                     else
                         forReturn["devices"][ip]["type"] = "unknown"

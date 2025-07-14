@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectTasksOptions">
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="build $FileDir$\$FileName$ $ContentRoot$ -o -id /root/code -ci -cia message-hook -cim public -ac -acp -acn dddd -pcmd &quot;builder $FileNameWithoutAllExtensions$&quot;" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="src" />
+      <option name="immediateSync" value="false" />
+      <option name="name" value="GreyScript Compile bin" />
+      <option name="output" value="$ContentRoot$\build" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="true" />
+      <option name="program" value="greybel" />
+      <option name="runOnExternalChanges" value="false" />
+      <option name="scopeName" value="bin" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="false">
+      <option name="arguments" value="build $FileDir$\$FileName$ $ContentRoot$ -o -id /root/code -ci -cia message-hook -cim public -ac -acp -acn dddd -pcmd &quot;builder_local $FileNameWithoutAllExtensions$&quot;" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="src" />
+      <option name="immediateSync" value="false" />
+      <option name="name" value="GreyScript Compile bin local" />
+      <option name="output" value="$ContentRoot$\build" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="true" />
+      <option name="program" value="greybel" />
+      <option name="runOnExternalChanges" value="false" />
+      <option name="scopeName" value="bin" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="build $FileDir$\$FileName$ $ContentRoot$ -b -id /root/code -ci -cia message-hook -cim public -pcmd &quot;configs $FileName$&quot;" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="*" />
+      <option name="immediateSync" value="false" />
+      <option name="name" value="Greyscript Configs private" />
+      <option name="output" value="$ContentRoot$\build" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="true" />
+      <option name="program" value="greybel" />
+      <option name="runOnExternalChanges" value="false" />
+      <option name="scopeName" value="config" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="build $FileDir$\$FileName$ $ContentRoot$ -b -id /root/code -ci -cia message-hook -cim public -pcmd &quot;configs_private $FileName$&quot;" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="*" />
+      <option name="immediateSync" value="false" />
+      <option name="name" value="Greyscript Configs" />
+      <option name="output" value="$ContentRoot$\build" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="true" />
+      <option name="program" value="greybel" />
+      <option name="runOnExternalChanges" value="false" />
+      <option name="scopeName" value="config private" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="false">
+      <option name="arguments" value="build $FileDir$\$FileName$ $ContentRoot$ -o -id /root/code -ci -cia message-hook -cim public" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="src" />
+      <option name="immediateSync" value="false" />
+      <option name="name" value="GreyScript Copy Code" />
+      <option name="output" value="$ContentRoot$\build" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="true" />
+      <option name="program" value="greybel" />
+      <option name="runOnExternalChanges" value="false" />
+      <option name="scopeName" value="Project Files" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="" />
+      <envs />
+    </TaskOptions>
+  </component>
+</project>
